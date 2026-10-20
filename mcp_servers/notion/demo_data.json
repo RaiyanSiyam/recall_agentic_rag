@@ -1,0 +1,152 @@
+{
+  "database_id": "notion-db-proj-x-q3",
+  "database_name": "Project X - Q3 Deliverables & Tasks",
+  "tasks": [
+    {
+      "id": "notion-task-01",
+      "task_code": "PROJ-T01",
+      "title": "HIPAA Data Isolation Layer",
+      "status": "In Progress",
+      "assignee": "Alex Rivera",
+      "due_date": "2026-10-25",
+      "priority": "High",
+      "category": "Security & Compliance",
+      "notes": "Enforcing per-tenant schema isolation in PostgreSQL to comply with HIPAA guidelines."
+    },
+    {
+      "id": "notion-task-02",
+      "task_code": "PROJ-T02",
+      "title": "Audit Trail Logging Service",
+      "status": "Done",
+      "assignee": "Maya Patel",
+      "due_date": "2026-10-10",
+      "priority": "High",
+      "category": "Compliance",
+      "notes": "Immutable write-once append-only audit trail logging completed and verified in staging."
+    },
+    {
+      "id": "notion-task-03",
+      "task_code": "PROJ-T03",
+      "title": "OAuth2 / OIDC Single Sign-On",
+      "status": "In Progress",
+      "assignee": "David Kim",
+      "due_date": "2026-11-01",
+      "previous_due_date": "2026-10-18",
+      "deadline_changed": true,
+      "change_reason": "Deadline updated last week from Oct 18 to Nov 01 due to upstream IdP metadata discrepancy and token validation delays.",
+      "priority": "High",
+      "category": "Identity"
+    },
+    {
+      "id": "notion-task-04",
+      "task_code": "PROJ-T04",
+      "title": "FHIR Data Connector",
+      "status": "Not Started",
+      "assignee": "Alex Rivera",
+      "due_date": "2026-11-15",
+      "priority": "High",
+      "category": "Integration",
+      "notes": "HL7 FHIR v4 resource parser and transformer for healthcare records."
+    },
+    {
+      "id": "notion-task-05",
+      "task_code": "PROJ-T05",
+      "title": "EHR Webhook Ingestion Engine",
+      "status": "In Progress",
+      "assignee": "Alex Rivera",
+      "due_date": "2026-11-05",
+      "previous_due_date": "2026-10-22",
+      "deadline_changed": true,
+      "change_reason": "Deadline updated last week from Oct 22 to Nov 05 to accommodate timeout retry testing and webhook replay safeguards.",
+      "priority": "High",
+      "category": "Integration"
+    },
+    {
+      "id": "notion-task-06",
+      "task_code": "PROJ-T06",
+      "title": "Role-Based Access Control (RBAC) UI",
+      "status": "In Progress",
+      "assignee": "Maya Patel",
+      "due_date": "2026-10-30",
+      "priority": "Medium",
+      "category": "Frontend"
+    },
+    {
+      "id": "notion-task-07",
+      "task_code": "PROJ-T07",
+      "title": "Encrypted Vector Search Pipeline",
+      "status": "Review",
+      "assignee": "Elena Rostova",
+      "due_date": "2026-10-20",
+      "priority": "High",
+      "category": "Data & ML",
+      "notes": "Vector similarity retrieval over clinical summaries with field-level encryption."
+    },
+    {
+      "id": "notion-task-08",
+      "task_code": "PROJ-T08",
+      "title": "Disaster Recovery Failover Playbook",
+      "status": "Not Started",
+      "assignee": "Devops Team",
+      "due_date": "2026-12-01",
+      "priority": "Medium",
+      "category": "Infrastructure"
+    },
+    {
+      "id": "notion-task-09",
+      "task_code": "PROJ-T09",
+      "title": "Tenant Billing Metering Service",
+      "status": "Done",
+      "assignee": "David Kim",
+      "due_date": "2026-10-05",
+      "priority": "Medium",
+      "category": "Platform"
+    },
+    {
+      "id": "notion-task-10",
+      "task_code": "PROJ-T10",
+      "title": "SDK Python Client Release",
+      "status": "In Progress",
+      "assignee": "Alex Rivera",
+      "due_date": "2026-11-20",
+      "priority": "Low",
+      "category": "Developer Experience"
+    },
+    {
+      "id": "notion-task-11",
+      "task_code": "PROJ-T11",
+      "title": "API Rate Limiting & Gateway Quotas",
+      "status": "Review",
+      "assignee": "Elena Rostova",
+      "due_date": "2026-10-28",
+      "priority": "High",
+      "category": "Infrastructure"
+    },
+    {
+      "id": "notion-task-12",
+      "task_code": "PROJ-T12",
+      "title": "Customer Pilot Onboarding Portal",
+      "status": "Not Started",
+      "assignee": "Maya Patel",
+      "due_date": "2026-12-15",
+      "priority": "Medium",
+      "category": "Frontend"
+    }
+  ],
+  "pages": [
+    {
+      "id": "notion-page-prd",
+      "title": "Project X - Product Requirements Document (PRD)",
+      "author": "Sarah Chen",
+      "last_edited": "2026-10-09T18:00:00Z",
+      "content": "Project X is an enterprise-tier data integration gateway designed for the healthcare vertical. It allows real-time synchronisation of patient medical records across legacy EHR systems and modern cloud applications while maintaining rigorous HIPAA and SOC2 compliance. Exactly 12 key deliverables are scheduled across Q3 to prepare for the pilot launch."
+    },
+    {
+      "id": "notion-page-security",
+      "title": "Project X - Security and Compliance Charter",
+      "author": "Rachel Hayes",
+      "last_edited": "2026-10-07T12:00:00Z",
+      "content": "All Project X data ingestion must enforce zero-trust token exchange and AWS KMS envelope encryption. Multi-tenant database tables must maintain logical or physical isolation. All authentication flows require MFA and OIDC integration."
+    }
+  ]
+}

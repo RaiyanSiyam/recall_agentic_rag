@@ -1,0 +1,84 @@
+services:
+  api:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    container_name: agentic-rag-api
+    ports:
+      - "8000:8000"
+    environment:
+      - DATA_MODE=${DATA_MODE:-demo}
+      - LLM_PROVIDER=${LLM_PROVIDER:-gemini}
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+      - SQLITE_DB_PATH=/app/data/memory.db
+      - CHROMA_PERSIST_DIR=/app/data/chroma_db
+      - GMAIL_MCP_URL=http://mcp-gmail:8001/sse
+      - NOTION_MCP_URL=http://mcp-notion:8002/sse
+      - JIRA_MCP_URL=http://mcp-jira:8003/sse
+    volumes:
+      - ./data:/app/data
+    depends_on:
+      - mcp-gmail
+      - mcp-notion
+      - mcp-jira
+    restart: unless-stopped
+
+  mcp-gmail:
+    build:
+      context: .
+      dockerfile: mcp-servers/gmail/Dockerfile
+    container_name: mcp-gmail-server
+    ports:
+      - "8001:8001"
+    environment:
+      - DATA_MODE=${DATA_MODE:-demo}
+      - GMAIL_CLIENT_ID=${GMAIL_CLIENT_ID}
+      - GMAIL_CLIENT_SECRET=${GMAIL_CLIENT_SECRET}
+      - GMAIL_REFRESH_TOKEN=${GMAIL_REFRESH_TOKEN}
+    restart: unless-stopped
+
+  mcp-notion:
+    build:
+      context: .
+      dockerfile: mcp-servers/notion/Dockerfile
+    container_name: mcp-notion-server
+    ports:
+      - "8002:8002"
+    environment:
+      - DATA_MODE=${DATA_MODE:-demo}
+      - NOTION_API_KEY=${NOTION_API_KEY}
+      - NOTION_DATABASE_ID=${NOTION_DATABASE_ID}
+    restart: unless-stopped
+
+  mcp-jira:
+    build:
+      context: .
+      dockerfile: mcp-servers/jira/Dockerfile
+    container_name: mcp-jira-server
+    ports:
+      - "8003:8003"
+    environment:
+      - DATA_MODE=${DATA_MODE:-demo}
+      - JIRA_DOMAIN=${JIRA_DOMAIN}
+      - JIRA_USER_EMAIL=${JIRA_USER_EMAIL}
+      - JIRA_API_TOKEN=${JIRA_API_TOKEN}
+      - JIRA_PROJECT_KEY=${JIRA_PROJECT_KEY}
+    restart: unless-stopped
+
+  web:
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+    container_name: agentic-rag-web
+    ports:
+      - "5173:5173"
+    environment:
+      - VITE_API_URL=http://localhost:8000
+    depends_on:
+      - api
+    restart: unless-stopped
+
+volumes:
+  agent_data:

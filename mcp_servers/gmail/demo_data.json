@@ -1,0 +1,44 @@
+{
+  "messages": [
+    {
+      "id": "msg-101",
+      "thread_id": "th-01",
+      "from": "sarah.chen@techcorp.internal",
+      "to": ["project-x-core@techcorp.internal"],
+      "subject": "[Project X] Executive Kickoff: Goals, Scope & Q3 Objectives",
+      "date": "2026-10-01T09:30:00Z",
+      "body": "Hi Team,\n\nWelcome to the official kickoff for Project X! As discussed in the executive steering meeting, our primary goals for this initiative are:\n1. Expand into new enterprise healthcare compliance markets.\n2. Deliver zero-downtime, 99.99% availability data synchronization.\n3. Establish full FHIR-compliant interoperability with legacy Electronic Health Record (EHR) systems.\n4. Ensure SOC2 Type II and HIPAA data isolation by the end of this quarter.\n\nThe board has allocated an initial Q3 budget of $450,000. Sarah Chen will act as Executive Sponsor and Alex Rivera will lead technical execution. Let's make this launch a success!\n\nBest,\nSarah Chen\nVP of Product",
+      "snippet": "Project X core goals are expanding into new enterprise healthcare compliance markets, targeting 99.99% availability, establishing FHIR-compliant interoperability with legacy hospital EHR systems, and achieving HIPAA compliance with an approved $450,000 budget."
+    },
+    {
+      "id": "msg-102",
+      "thread_id": "th-02",
+      "from": "david.kim@techcorp.internal",
+      "to": ["project-x-dev@techcorp.internal"],
+      "subject": "[Project X] Architecture Decisions: Event-Driven Sync & Zero-Trust Auth",
+      "date": "2026-10-04T14:15:00Z",
+      "body": "Team,\n\nFollowing yesterday's RFC review, here are the finalized architecture decisions for Project X:\n- Ingestion Pipeline: We are adopting an event-driven sync pipeline utilizing Kafka streams to decouple real-time updates from core database writes.\n- Authentication: Zero-trust architecture with OAuth2 / OIDC token exchange.\n- Security: Envelope encryption using AWS KMS Customer-Managed Keys (CMK) with per-tenant isolation.\n\nPlease review the PRD on Notion for task assignments.\n\nRegards,\nDavid Kim\nPrincipal Architect",
+      "snippet": "Architecture consensus reached: We will adopt an event-driven sync pipeline with Kafka streams, zero-trust OAuth2/OIDC token exchange, and AWS KMS envelope encryption with per-tenant data isolation."
+    },
+    {
+      "id": "msg-103",
+      "thread_id": "th-03",
+      "from": "compliance-audit@techcorp.internal",
+      "to": ["sarah.chen@techcorp.internal", "alex.rivera@techcorp.internal"],
+      "subject": "URGENT: SOC2 Type II & HIPAA Compliance Deadlines",
+      "date": "2026-10-08T11:00:00Z",
+      "body": "Sarah & Alex,\n\nOur third-party audit firm (Coalfire) has scheduled our SOC2 Type II and HIPAA audit baseline starting November 15. All HIPAA data isolation controls and immutable audit logging must be deployed in staging by October 30. Any delay beyond this will defer our enterprise pilot rollout to Q1 next year.\n\nPlease ensure the compliance tasks on Notion and Jira have top engineering priority.\n\nBest,\nRachel Hayes\nChief Compliance Officer",
+      "snippet": "SOC2 Type II & HIPAA audit begins Nov 15. All HIPAA data isolation controls and immutable audit logging must be deployed to staging by October 30 deadline."
+    },
+    {
+      "id": "msg-104",
+      "thread_id": "th-04",
+      "from": "marcus.vance@techcorp.internal",
+      "to": ["project-x-leads@techcorp.internal"],
+      "subject": "[Project X] Q3 Headcount & Resource Allocation Update",
+      "date": "2026-10-12T16:45:00Z",
+      "body": "Leads,\n\nHeadcount allocations for Project X are locked:\n- Alex Rivera: Lead Backend & EHR Integrations\n- Maya Patel: Fullstack & Audit Logging UI\n- Elena Rostova: Data Platform & Vector Search\n- David Kim: Security, KMS & Infrastructure\n- 2 QA contractor engineers starting Oct 16.\n\nWeekly syncs remain Tuesdays at 10 AM PST.\n\nMarcus Vance\nDirector of Engineering",
+      "snippet": "Project X staffing locked: 4 senior staff (Alex Rivera, Maya Patel, Elena Rostova, David Kim) plus 2 dedicated QA contractors."
+    }
+  ]
+}

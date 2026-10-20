@@ -1,0 +1,255 @@
+{
+  "benchmark_queries": [
+    {
+      "id": "q01",
+      "category": "multi_source_summary",
+      "query": "Summarize Project X",
+      "expected_sources": ["gmail", "notion", "jira"],
+      "expected_facts": [
+        "healthcare",
+        "12",
+        "deadline",
+        "blocker"
+      ],
+      "description": "Comprehensive multi-source executive summary."
+    },
+    {
+      "id": "q02",
+      "category": "goals_scope",
+      "query": "What are the core strategic goals and target availability for Project X?",
+      "expected_sources": ["gmail"],
+      "expected_facts": [
+        "99.99%",
+        "healthcare compliance",
+        "FHIR"
+      ],
+      "description": "Executive kickoff goals."
+    },
+    {
+      "id": "q03",
+      "category": "goals_scope",
+      "query": "What is the approved Q3 budget for Project X and who is executive sponsor?",
+      "expected_sources": ["gmail"],
+      "expected_facts": [
+        "$450,000",
+        "Sarah Chen"
+      ],
+      "description": "Budget and sponsorship."
+    },
+    {
+      "id": "q04",
+      "category": "goals_scope",
+      "query": "What architecture decisions were made regarding event streaming and data encryption?",
+      "expected_sources": ["gmail"],
+      "expected_facts": [
+        "Kafka",
+        "AWS KMS",
+        "Customer-Managed Keys"
+      ],
+      "description": "Architecture RFC consensus."
+    },
+    {
+      "id": "q05",
+      "category": "goals_scope",
+      "query": "What is the hard staging deployment deadline for SOC2 Type II and HIPAA audit controls?",
+      "expected_sources": ["gmail"],
+      "expected_facts": [
+        "October 30",
+        "November 15"
+      ],
+      "description": "Compliance audit timeline."
+    },
+    {
+      "id": "q06",
+      "category": "deliverables",
+      "query": "How many key tasks are planned in the Project X deliverables roadmap this quarter?",
+      "expected_sources": ["notion"],
+      "expected_facts": [
+        "12"
+      ],
+      "description": "Quarterly deliverable task count."
+    },
+    {
+      "id": "q07",
+      "category": "deliverables",
+      "query": "Who is assigned to the HIPAA Data Isolation Layer and what is its due date?",
+      "expected_sources": ["notion"],
+      "expected_facts": [
+        "Alex Rivera",
+        "October 25"
+      ],
+      "description": "Task PROJ-T01 owner and date."
+    },
+    {
+      "id": "q08",
+      "category": "deliverables",
+      "query": "What is the status of the Audit Trail Logging Service task?",
+      "expected_sources": ["notion"],
+      "expected_facts": [
+        "Done",
+        "Maya Patel"
+      ],
+      "description": "Task PROJ-T02 completion status."
+    },
+    {
+      "id": "q09",
+      "category": "deliverables",
+      "query": "What tasks are assigned to Elena Rostova in Notion?",
+      "expected_sources": ["notion"],
+      "expected_facts": [
+        "Encrypted Vector Search",
+        "API Rate Limiting"
+      ],
+      "description": "Tasks by assignee filter."
+    },
+    {
+      "id": "q10",
+      "category": "deliverables",
+      "query": "What is the title and author of the Project X PRD document?",
+      "expected_sources": ["notion"],
+      "expected_facts": [
+        "Product Requirements Document",
+        "Sarah Chen"
+      ],
+      "description": "PRD page retrieval."
+    },
+    {
+      "id": "q11",
+      "category": "blockers_deadlines",
+      "query": "What critical blockers are currently impeding Project X?",
+      "expected_sources": ["jira"],
+      "expected_facts": [
+        "PROJ-102",
+        "504",
+        "PROJ-103",
+        "KMS"
+      ],
+      "description": "Critical active blockers."
+    },
+    {
+      "id": "q12",
+      "category": "blockers_deadlines",
+      "query": "Why is the EHR Sandbox API failing in Jira PROJ-102?",
+      "expected_sources": ["jira"],
+      "expected_facts": [
+        "504 Gateway Timeout",
+        "FHIR"
+      ],
+      "description": "PROJ-102 blocker details."
+    },
+    {
+      "id": "q13",
+      "category": "blockers_deadlines",
+      "query": "What issue is affecting AWS KMS Customer-Managed Key rotation in staging?",
+      "expected_sources": ["jira"],
+      "expected_facts": [
+        "PROJ-103",
+        "AccessDeniedException",
+        "David Kim"
+      ],
+      "description": "PROJ-103 KMS blocker details."
+    },
+    {
+      "id": "q14",
+      "category": "blockers_deadlines",
+      "query": "Which project deadlines were updated last week and why?",
+      "expected_sources": ["jira", "notion"],
+      "expected_facts": [
+        "PROJ-104",
+        "November 1",
+        "PROJ-106",
+        "November 5"
+      ],
+      "description": "Cross-system rescheduled deadlines."
+    },
+    {
+      "id": "q15",
+      "category": "blockers_deadlines",
+      "query": "What is the new due date for the OIDC authentication migration task?",
+      "expected_sources": ["jira", "notion"],
+      "expected_facts": [
+        "2026-11-01"
+      ],
+      "description": "PROJ-104 rescheduled date."
+    },
+    {
+      "id": "q16",
+      "category": "multi_source_summary",
+      "query": "What work is Alex Rivera responsible for across emails, Notion, and Jira?",
+      "expected_sources": ["gmail", "notion", "jira"],
+      "expected_facts": [
+        "Lead Backend",
+        "HIPAA Data Isolation",
+        "PROJ-102"
+      ],
+      "description": "Cross-system entity synthesis (Alex Rivera)."
+    },
+    {
+      "id": "q17",
+      "category": "multi_source_summary",
+      "query": "Give me an operational status update: sprint name, active blockers, and high priority tasks.",
+      "expected_sources": ["jira", "notion"],
+      "expected_facts": [
+        "Sprint 24",
+        "PROJ-102",
+        "PROJ-103"
+      ],
+      "description": "Sprint status + blockers + task priorities."
+    },
+    {
+      "id": "q18",
+      "category": "goals_scope",
+      "query": "Who are the four senior engineers dedicated to Project X?",
+      "expected_sources": ["gmail"],
+      "expected_facts": [
+        "Alex Rivera",
+        "Maya Patel",
+        "Elena Rostova",
+        "David Kim"
+      ],
+      "description": "Engineering resource allocation."
+    },
+    {
+      "id": "q19",
+      "category": "deliverables",
+      "query": "When is the Disaster Recovery Failover Playbook scheduled for completion?",
+      "expected_sources": ["notion"],
+      "expected_facts": [
+        "2026-12-01",
+        "Devops Team"
+      ],
+      "description": "PROJ-T08 deliverable date."
+    },
+    {
+      "id": "q20",
+      "category": "blockers_deadlines",
+      "query": "What throughput did the HL7 FHIR parser achieve in PROJ-105 benchmark tests?",
+      "expected_sources": ["jira"],
+      "expected_facts": [
+        "4,200",
+        "records/sec"
+      ],
+      "description": "PROJ-105 performance benchmark result."
+    },
+    {
+      "id": "q21",
+      "category": "negative",
+      "query": "What is the marketing budget for Project Z in European regions?",
+      "expected_sources": ["gmail"],
+      "expected_facts": [
+        "not found"
+      ],
+      "description": "Negative testing / missing information handling."
+    },
+    {
+      "id": "q22",
+      "category": "negative",
+      "query": "Who is leading the Android mobile application launch?",
+      "expected_sources": ["notion"],
+      "expected_facts": [
+        "not found"
+      ],
+      "description": "Negative testing / out of scope inquiry."
+    }
+  ]
+}
