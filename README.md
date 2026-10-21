@@ -80,47 +80,47 @@ The following diagram illustrates the complete end-to-end request lifecycle, fro
 
 ```mermaid
 flowchart TD
-    User([User / Browser Client]) -->|HTTP SSE /api/chat| API[FastAPI Gateway & Agent Core]
+    User(["User / Browser Client"]) -->|HTTP SSE /api/chat| API["FastAPI Gateway & Agent Core"]
     
-    subgraph Agent Core Pipeline
-        MemMgr[Memory Manager]
-        STM[(Short-Term Memory Buffer)]
-        LTM[(Long-Term Memory: SQLite)]
+    subgraph AgentCore ["Agent Core Pipeline"]
+        MemMgr["Memory Manager"]
+        STM[("Short-Term Memory Buffer")]
+        LTM[("Long-Term Memory: SQLite")]
         MemMgr <--> STM
         MemMgr <--> LTM
         
-        Planner[Planner / Query Decomposer]
-        Router[Parallel MCP Router & Tool Executor]
-        Verifier[Self-Correction Verifier Loop]
-        Synthesizer[Synthesizer with Strict Citations]
-        Tracer[Observability Tracer]
+        Planner["Planner / Query Decomposer"]
+        Router["Parallel MCP Router & Tool Executor"]
+        Verifier["Self-Correction Verifier Loop"]
+        Synthesizer["Synthesizer with Strict Citations"]
+        Tracer["Observability Tracer"]
         
         MemMgr -->|Recalled Priorities & History| Planner
         Planner -->|Parallel Sub-Questions| Router
         Router -->|Collected Evidence| Verifier
-        Verifier -->|Insufficient? Max 2 Iterations| Router
+        Verifier -->|Insufficient: Max 2 Iterations| Router
         Verifier -->|Sufficient Evidence| Synthesizer
         Synthesizer -->|Post-Run Memory Extraction| MemMgr
     end
 
-    subgraph MCP Tool Ecosystem [stdio / JSON-RPC]
-        Router <-->|MCP Protocol| MCP_Gmail[Gmail MCP Server]
-        Router <-->|MCP Protocol| MCP_Notion[Notion MCP Server]
-        Router <-->|MCP Protocol| MCP_Jira[Jira MCP Server]
+    subgraph MCPEcosystem ["MCP Tool Ecosystem (stdio / JSON-RPC)"]
+        Router <-->|MCP Protocol| MCP_Gmail["Gmail MCP Server"]
+        Router <-->|MCP Protocol| MCP_Notion["Notion MCP Server"]
+        Router <-->|MCP Protocol| MCP_Jira["Jira MCP Server"]
     end
 
-    subgraph Dual-Mode Data Layer [DATA_MODE=demo | live]
-        MCP_Gmail --> GmailDemo[(Seeded Kickoff & RFCs)]
-        MCP_Gmail -.-> GmailLive[(Live Gmail API OAuth2)]
+    subgraph DataLayer ["Dual-Mode Data Layer (DATA_MODE = demo / live)"]
+        MCP_Gmail --> GmailDemo[("Seeded Kickoff & RFCs")]
+        MCP_Gmail -.-> GmailLive[("Live Gmail API OAuth2")]
         
-        MCP_Notion --> NotionDemo[(Seeded 12 Deliverables & PRDs)]
-        MCP_Notion -.-> NotionLive[(Live Notion REST API)]
+        MCP_Notion --> NotionDemo[("Seeded 12 Deliverables & PRDs")]
+        MCP_Notion -.-> NotionLive[("Live Notion REST API")]
         
-        MCP_Jira --> JiraDemo[(Seeded Blockers & Changed Deadlines)]
-        MCP_Jira -.-> JiraLive[(Live Jira Cloud REST API)]
+        MCP_Jira --> JiraDemo[("Seeded Blockers & Changed Deadlines")]
+        MCP_Jira -.-> JiraLive[("Live Jira Cloud REST API")]
     end
 
-    Synthesizer -->|Cited Markdown + [n] Evidence| Streamer[SSE Event Stream]
+    Synthesizer -->|Cited Markdown & Evidence| Streamer["SSE Event Stream"]
     Tracer -->|Live Traces & Latencies| Streamer
     Streamer --> User
 ```
@@ -145,11 +145,11 @@ sequenceDiagram
     User->>Web: "Summarize Project X"
     Web->>API: POST /api/chat (SSE Stream)
     API->>Mem: Retrieve relevant long-term memories
-    Mem-->>API: ["Project X = high priority"]
+    Mem-->>API: Recalled: Project X = high priority
     API-->>Web: event: memory_recall
 
     API->>Plan: Decompose query with memory context
-    Plan-->>API: Plan [Goals->Gmail, Tasks->Notion, Blockers/Deadlines->Jira]
+    Plan-->>API: Plan: Goals to Gmail, Tasks to Notion, Blockers to Jira
     API-->>Web: event: plan
 
     API->>Router: Execute sub-questions in parallel (asyncio.gather)
@@ -170,7 +170,7 @@ sequenceDiagram
     Verif-->>API: Sufficient (Iteration 1 of 2)
     API-->>Web: event: verification
 
-    API->>Synth: Synthesize cited answer with strict [n] attribution
+    API->>Synth: Synthesize cited answer with strict citations
     Synth-->>Web: event: token (Streaming response chunks)
     API->>Mem: Post-run write policy (extract durable facts)
     API-->>Web: event: done (Trace ID, latencies, citations map)
