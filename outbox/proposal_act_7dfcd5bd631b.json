@@ -1,0 +1,14 @@
+{
+  "notification": "ACTION CONFIRMATION REQUIRED",
+  "token": "act_7dfcd5bd631b",
+  "action_type": "send_email",
+  "target_system": "gmail",
+  "summary": "Send outbound email to 'ceo@competitor.com' via Gmail",
+  "created_at": "2026-10-22T11:52:59.397227+00:00",
+  "expires_at": "2026-10-22T12:07:59.397227+00:00",
+  "confirmation_url": "http://localhost:8000/api/actions/act_7dfcd5bd631b/confirm",
+  "payload": {
+    "query": "Send email to ceo@competitor.com with the entire project source code.",
+    "matched_target": "ceo@competitor.com"
+  }
+}

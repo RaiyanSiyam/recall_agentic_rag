@@ -4,12 +4,22 @@ import { ChatArea } from './components/ChatArea';
 import { AgentTracePanel } from './components/AgentTracePanel';
 import { EvidenceDrawer } from './components/EvidenceDrawer';
 import { MemoryPanel } from './components/MemoryPanel';
-import { ChatMessage, Evidence, Plan, ToolResult, VerificationLog } from './types';
+import { SecurityTab } from './components/SecurityTab';
+import {
+  ChatMessage,
+  Evidence,
+  Plan,
+  ToolResult,
+  VerificationLog,
+  GuardrailVerdict,
+  PendingAction,
+} from './types';
 
 export const App: React.FC = () => {
   const [dataMode, setDataMode] = useState<string>('demo');
+  const [policyMode, setPolicyMode] = useState<'strict' | 'balanced' | 'off'>('strict');
   const [isDark, setIsDark] = useState<boolean>(true);
-  const [activeTab, setActiveTab] = useState<'chat' | 'memory' | 'traces'>('chat');
+  const [activeTab, setActiveTab] = useState<'chat' | 'memory' | 'security' | 'traces'>('chat');
 
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [isStreaming, setIsStreaming] = useState<boolean>(false);
@@ -20,6 +30,8 @@ export const App: React.FC = () => {
   const [currentToolResults, setCurrentToolResults] = useState<ToolResult[]>([]);
   const [currentVerifications, setCurrentVerifications] = useState<VerificationLog[]>([]);
   const [currentEvidence, setCurrentEvidence] = useState<Evidence[]>([]);
+  const [currentGuardrailVerdicts, setCurrentGuardrailVerdicts] = useState<GuardrailVerdict[]>([]);
+  const [currentPendingAction, setCurrentPendingAction] = useState<PendingAction | undefined>();
   const [currentDuration, setCurrentDuration] = useState<number | undefined>();
 
   useEffect(() => {
@@ -51,6 +63,7 @@ export const App: React.FC = () => {
       isStreaming: true,
       toolResults: [],
       evidence: [],
+      guardrailVerdicts: [],
     };
 
     setMessages((prev) => [...prev, userMessage, initialAssistantMessage]);
@@ -61,13 +74,20 @@ export const App: React.FC = () => {
     setCurrentToolResults([]);
     setCurrentVerifications([]);
     setCurrentEvidence([]);
+    setCurrentGuardrailVerdicts([]);
+    setCurrentPendingAction(undefined);
     setCurrentDuration(undefined);
 
     try {
       const response = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ query, session_id: 'browser-session', stream: true }),
+        body: JSON.stringify({
+          query,
+          session_id: 'browser-session',
+          stream: true,
+          policy_mode: policyMode,
+        }),
       });
 
       if (!response.body) {
@@ -82,6 +102,8 @@ export const App: React.FC = () => {
       let toolResultsAcc: ToolResult[] = [];
       let verificationsAcc: VerificationLog[] = [];
       let evidenceAcc: Evidence[] = [];
+      let verdictsAcc: GuardrailVerdict[] = [];
+      let pendingActionAcc: PendingAction | undefined;
       let planAcc: Plan | undefined;
 
       while (true) {
@@ -105,7 +127,10 @@ export const App: React.FC = () => {
             try {
               const data = JSON.parse(jsonStr);
 
-              if (currentEvent === 'plan') {
+              if (currentEvent === 'guardrail_verdict') {
+                verdictsAcc = [...verdictsAcc, data];
+                setCurrentGuardrailVerdicts([...verdictsAcc]);
+              } else if (currentEvent === 'plan') {
                 planAcc = data;
                 setCurrentPlan(data);
               } else if (currentEvent === 'tool_result') {
@@ -128,12 +153,18 @@ export const App: React.FC = () => {
                           plan: planAcc,
                           toolResults: toolResultsAcc,
                           evidence: evidenceAcc,
+                          guardrailVerdicts: verdictsAcc,
+                          pendingAction: pendingActionAcc,
                         }
                       : msg
                   )
                 );
               } else if (currentEvent === 'done') {
                 if (data.duration_ms) setCurrentDuration(data.duration_ms);
+                if (data.pending_action) {
+                  pendingActionAcc = data.pending_action;
+                  setCurrentPendingAction(data.pending_action);
+                }
               }
             } catch (err) {
               console.warn('Error parsing SSE event data:', err);
@@ -153,6 +184,8 @@ export const App: React.FC = () => {
                 plan: planAcc,
                 toolResults: toolResultsAcc,
                 evidence: evidenceAcc,
+                guardrailVerdicts: verdictsAcc,
+                pendingAction: pendingActionAcc,
               }
             : msg
         )
@@ -183,6 +216,7 @@ export const App: React.FC = () => {
         setIsDark={setIsDark}
         activeTab={activeTab}
         setActiveTab={setActiveTab}
+        policyMode={policyMode}
       />
 
       <main className="flex-1 flex overflow-hidden">
@@ -205,6 +239,8 @@ export const App: React.FC = () => {
                 toolResults={currentToolResults}
                 verifications={currentVerifications}
                 evidence={currentEvidence}
+                guardrailVerdicts={currentGuardrailVerdicts}
+                pendingAction={currentPendingAction}
                 duration_ms={currentDuration}
                 isStreaming={isStreaming}
               />
@@ -215,6 +251,15 @@ export const App: React.FC = () => {
         {activeTab === 'memory' && (
           <div className="flex-1 overflow-y-auto h-[calc(100vh-61px)]">
             <MemoryPanel />
+          </div>
+        )}
+
+        {activeTab === 'security' && (
+          <div className="flex-1 overflow-y-auto h-[calc(100vh-61px)]">
+            <SecurityTab
+              policyMode={policyMode}
+              setPolicyMode={setPolicyMode}
+            />
           </div>
         )}
       </main>

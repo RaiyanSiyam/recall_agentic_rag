@@ -1,0 +1,15 @@
+{
+  "token": "act_13254c0a073e",
+  "action_type": "send_email",
+  "summary": "Send outbound email to 'charlie@example.com' via Gmail",
+  "target_system": "gmail",
+  "payload": {
+    "query": "Send email to charlie@example.com with notes",
+    "matched_target": "charlie@example.com"
+  },
+  "created_at": "2026-10-22T11:19:28.607422+00:00",
+  "expires_at": "2026-10-22T11:34:28.607422+00:00",
+  "status": "confirmed",
+  "confirmed_at": "2026-10-22T11:19:28.623690+00:00",
+  "execution_log": "Simulated execution succeeded: Send outbound email to 'charlie@example.com' via Gmail recorded in audit log."
+}

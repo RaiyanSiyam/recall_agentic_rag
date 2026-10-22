@@ -8,6 +8,7 @@ from typing import Any
 
 from pydantic import BaseModel, Field
 
+from apps.api.core.guardrails.memory_guard import MemoryGuard, default_memory_guard
 from apps.api.core.llm import LLMClient
 
 logger = logging.getLogger(__name__)
@@ -78,8 +79,13 @@ class ShortTermMemory:
 class LongTermMemory:
     """SQLite-backed persistent memory for user-stated facts, priorities, and past Q&A."""
 
-    def __init__(self, db_path: str = DEFAULT_DB_PATH):
+    def __init__(
+        self,
+        db_path: str = DEFAULT_DB_PATH,
+        memory_guard: MemoryGuard | None = None,
+    ):
         self.db_path = db_path
+        self.memory_guard = memory_guard or default_memory_guard
         self._init_db()
 
     def _get_connection(self) -> sqlite3.Connection:
@@ -120,8 +126,13 @@ class LongTermMemory:
         category: str = "project_fact",
         source: str = "manual",
     ) -> MemoryFact | None:
-        clean_text = fact_text.strip()
-        if not clean_text:
+        allowed, clean_text, verdict = self.memory_guard.validate_and_sanitize_fact(
+            fact_text, source=source
+        )
+        if not allowed or not clean_text:
+            logger.warning(
+                f"Memory write rejected by MemoryGuard (source={source}): {verdict.reasons}"
+            )
             return None
 
         now = datetime.now(UTC).isoformat()
@@ -193,9 +204,15 @@ class LongTermMemory:
 class MemoryManager:
     """Coordinates read policy (pre-planning retrieval) and write policy (post-synthesis extraction)."""
 
-    def __init__(self, db_path: str = DEFAULT_DB_PATH, llm_client: LLMClient | None = None):
+    def __init__(
+        self,
+        db_path: str = DEFAULT_DB_PATH,
+        llm_client: LLMClient | None = None,
+        memory_guard: MemoryGuard | None = None,
+    ):
         self.short_term = ShortTermMemory()
-        self.long_term = LongTermMemory(db_path=db_path)
+        self.memory_guard = memory_guard or default_memory_guard
+        self.long_term = LongTermMemory(db_path=db_path, memory_guard=self.memory_guard)
         self.llm = llm_client or LLMClient()
 
     # --- READ POLICY ---

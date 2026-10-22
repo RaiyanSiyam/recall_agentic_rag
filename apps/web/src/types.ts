@@ -49,6 +49,28 @@ export interface MemoryFact {
   created_at: string;
 }
 
+export interface GuardrailVerdict {
+  allowed: boolean;
+  action: 'allow' | 'block' | 'redact' | 'pause';
+  guardrail_name: string;
+  reasons: string[];
+  matched_rules?: string[];
+  metadata?: Record<string, any>;
+}
+
+export interface PendingAction {
+  token: string;
+  action_type: string;
+  summary: string;
+  target_system: string;
+  payload?: Record<string, any>;
+  created_at: string;
+  expires_at: string;
+  status: 'pending' | 'confirmed' | 'rejected' | 'expired';
+  confirmed_at?: string;
+  execution_log?: string;
+}
+
 export interface ChatMessage {
   id: string;
   role: 'user' | 'assistant';
@@ -58,6 +80,8 @@ export interface ChatMessage {
   verifications?: VerificationLog[];
   evidence?: Evidence[];
   citations?: Evidence[];
+  guardrailVerdicts?: GuardrailVerdict[];
+  pendingAction?: PendingAction;
   duration_ms?: number;
   isStreaming?: boolean;
 }

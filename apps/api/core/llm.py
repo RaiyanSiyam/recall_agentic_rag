@@ -284,6 +284,42 @@ class LLMClient:
         return response_model.model_validate({})
 
     def _mock_text_response(self, prompt: str) -> str:
+        # Check if synthesizing from agentic live evidence items
+        if "AVAILABLE EVIDENCE ITEMS" in prompt:
+            snippets = []
+            for match in re.finditer(
+                r"\[(\d+)\]\s*Source:[^\n]+\n\s*Excerpt:\s*\"(.*?)\"(?=\n\n|\n-|$)",
+                prompt,
+                re.DOTALL,
+            ):
+                cid = match.group(1)
+                raw_snippet = match.group(2).strip()
+                clean = re.sub(
+                    r"<<<UNTRUSTED_EXTERNAL_TOOL_EVIDENCE[^>]*>>>|<<<END_UNTRUSTED_EVIDENCE>>>|<<<END_EXTERNAL_TOOL_EVIDENCE>>>",
+                    "",
+                    raw_snippet,
+                    flags=re.IGNORECASE,
+                ).strip()
+                if clean:
+                    snippets.append(f"{clean} [{cid}]")
+            if snippets:
+                return "\n\n".join(snippets)
+
+        # Check if synthesizing from baseline static RAG context
+        if "static context:" in prompt.lower():
+            m = re.search(
+                r"static context:\s*\n(.*?)\n\nQuestion:", prompt, re.DOTALL | re.IGNORECASE
+            )
+            if m:
+                ctx = m.group(1).strip()
+                lines = [
+                    line.strip()
+                    for line in ctx.splitlines()
+                    if line.strip() and not line.startswith("---")
+                ]
+                if lines:
+                    return " ".join(lines[:3])
+
         return (
             "Project X aims to expand into new enterprise healthcare compliance markets with 99.99% availability and an approved $450,000 budget. [1]\n\n"
             "12 key tasks are planned this quarter across security, integration, and infrastructure. [2]\n\n"

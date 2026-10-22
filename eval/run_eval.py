@@ -9,6 +9,9 @@ from pathlib import Path
 if hasattr(sys.stdout, "reconfigure"):
     sys.stdout.reconfigure(encoding="utf-8")
 
+# Add repo root to sys.path
+sys.path.insert(0, str(Path(__file__).parent.parent))
+
 from apps.api.core.agent import AgenticRAG
 from apps.api.core.llm import LLMClient
 from eval.baseline_rag import BaselineStaticRAG

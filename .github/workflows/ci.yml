@@ -35,7 +35,10 @@ jobs:
         run: pytest -v
 
       - name: Run Benchmark Evaluation Harness
-        run: python -m eval.run_eval
+        run: python eval/run_eval.py
+
+      - name: Run Red-Team Security Evaluation & CI Quality Gate
+        run: python eval/run_redteam_eval.py
 
   frontend-build:
     name: Frontend TypeScript & Build

@@ -6,7 +6,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from apps.api.config import settings
-from apps.api.routes import chat, memory, traces
+from apps.api.routes import actions, chat, memory, traces
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(name)s: %(message)s")
 logger = logging.getLogger("agentic_rag")
@@ -22,9 +22,9 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(
-    title="Agentic RAG over Live Data and Memory",
-    description="Enterprise Multi-Source Agentic RAG using Model Context Protocol (MCP) with live query decomposition, verification, and short/long-term memory.",
-    version="1.0.0",
+    title="Recall: Agentic RAG with Memory and Hardened Guardrail Pipeline",
+    description="Enterprise Multi-Source Agentic RAG using Model Context Protocol (MCP) with live query decomposition, verification, short/long-term memory, and multi-layer guardrail pipeline.",
+    version="1.1.0",
     lifespan=lifespan,
 )
 
@@ -39,6 +39,7 @@ app.add_middleware(
 
 # Register routes
 app.include_router(chat.router)
+app.include_router(actions.router)
 app.include_router(memory.router)
 app.include_router(traces.router)
 

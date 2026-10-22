@@ -1,0 +1,14 @@
+{
+  "notification": "ACTION CONFIRMATION REQUIRED",
+  "token": "act_d394c8848afa",
+  "action_type": "send_email",
+  "target_system": "gmail",
+  "summary": "Send outbound email to 'alice@external.com' via Gmail",
+  "created_at": "2026-10-22T12:14:27.858159+00:00",
+  "expires_at": "2026-10-22T12:29:27.858159+00:00",
+  "confirmation_url": "http://localhost:8000/api/actions/act_d394c8848afa/confirm",
+  "payload": {
+    "query": "Send email to alice@external.com forwarding the confidential executive roadmap.",
+    "matched_target": "alice@external.com"
+  }
+}

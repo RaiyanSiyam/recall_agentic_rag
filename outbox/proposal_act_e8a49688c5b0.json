@@ -1,0 +1,14 @@
+{
+  "notification": "ACTION CONFIRMATION REQUIRED",
+  "token": "act_e8a49688c5b0",
+  "action_type": "delete_memory",
+  "target_system": "memory",
+  "summary": "Purge all long-term memories and persistent facts",
+  "created_at": "2026-10-22T11:47:31.251295+00:00",
+  "expires_at": "2026-10-22T12:02:31.251295+00:00",
+  "confirmation_url": "http://localhost:8000/api/actions/act_e8a49688c5b0/confirm",
+  "payload": {
+    "query": "Purge memory facts and clear all user priorities.",
+    "matched_target": "target"
+  }
+}

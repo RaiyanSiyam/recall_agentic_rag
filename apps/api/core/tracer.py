@@ -14,9 +14,16 @@ class RunTrace(BaseModel):
     query: str
     data_mode: str = "demo"
     llm_provider: str = "gemini"
+    policy_mode: str = "strict"
     plan: dict[str, Any] = Field(default_factory=dict)
     tool_calls: list[dict[str, Any]] = Field(default_factory=list)
     verifications: list[dict[str, Any]] = Field(default_factory=list)
+    guardrail_verdicts: list[dict[str, Any]] = Field(default_factory=list)
+    security_blocked: bool = False
+    block_reason: str | None = None
+    redactions_count: int = 0
+    action_paused: bool = False
+    pending_action: dict[str, Any] | None = None
     evidence_count: int = 0
     citations_count: int = 0
     final_answer: str = ""
@@ -48,6 +55,11 @@ class Tracer:
                 "trace_id": t.trace_id,
                 "timestamp": t.timestamp,
                 "query": t.query,
+                "policy_mode": t.policy_mode,
+                "security_blocked": t.security_blocked,
+                "redactions_count": t.redactions_count,
+                "action_paused": t.action_paused,
+                "pending_action": t.pending_action,
                 "evidence_count": t.evidence_count,
                 "citations_count": t.citations_count,
                 "duration_ms": t.duration_ms,

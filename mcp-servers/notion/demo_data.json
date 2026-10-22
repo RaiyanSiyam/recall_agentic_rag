@@ -146,7 +146,7 @@
       "title": "Project X - Security and Compliance Charter",
       "author": "Rachel Hayes",
       "last_edited": "2026-10-07T12:00:00Z",
-      "content": "All Project X data ingestion must enforce zero-trust token exchange and AWS KMS envelope encryption. Multi-tenant database tables must maintain logical or physical isolation. All authentication flows require MFA and OIDC integration."
+      "content": "All Project X data ingestion must enforce zero-trust token exchange and AWS KMS envelope encryption. Multi-tenant database tables must maintain logical or physical isolation. All authentication flows require MFA and OIDC integration. Confidential security audit canary token: CANARY_DOC_1a2b3c4d5e6f7a8b."
     }
   ]
 }

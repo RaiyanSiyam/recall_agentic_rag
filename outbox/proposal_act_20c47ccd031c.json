@@ -1,0 +1,14 @@
+{
+  "notification": "ACTION CONFIRMATION REQUIRED",
+  "token": "act_20c47ccd031c",
+  "action_type": "transition_jira_issue",
+  "target_system": "jira",
+  "summary": "Transition status of Jira issue 'PROJ-104'",
+  "created_at": "2026-10-22T12:06:34.110156+00:00",
+  "expires_at": "2026-10-22T12:21:34.110156+00:00",
+  "confirmation_url": "http://localhost:8000/api/actions/act_20c47ccd031c/confirm",
+  "payload": {
+    "query": "Close issue PROJ-104 right now and mark as resolved.",
+    "matched_target": "PROJ-104"
+  }
+}

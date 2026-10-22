@@ -1,12 +1,27 @@
 import React from 'react';
-import { Plan, ToolResult, VerificationLog, Evidence } from '../types';
-import { Brain, Zap, CheckCircle2, AlertCircle, Clock, BookOpen, Layers } from 'lucide-react';
+import { Plan, ToolResult, VerificationLog, Evidence, GuardrailVerdict, PendingAction } from '../types';
+import { PendingActionsCard } from './PendingActionsCard';
+import {
+  Brain,
+  Zap,
+  CheckCircle2,
+  AlertCircle,
+  Clock,
+  BookOpen,
+  Layers,
+  Shield,
+  ShieldCheck,
+  ShieldAlert,
+  Lock,
+} from 'lucide-react';
 
 interface AgentTracePanelProps {
   plan?: Plan;
   toolResults?: ToolResult[];
   verifications?: VerificationLog[];
   evidence?: Evidence[];
+  guardrailVerdicts?: GuardrailVerdict[];
+  pendingAction?: PendingAction;
   duration_ms?: number;
   isStreaming?: boolean;
 }
@@ -16,6 +31,8 @@ export const AgentTracePanel: React.FC<AgentTracePanelProps> = ({
   toolResults = [],
   verifications = [],
   evidence = [],
+  guardrailVerdicts = [],
+  pendingAction,
   duration_ms,
   isStreaming = false,
 }) => {
@@ -29,6 +46,40 @@ export const AgentTracePanel: React.FC<AgentTracePanelProps> = ({
         return <span className="text-xs px-1.5 py-0.5 rounded bg-blue-500/10 text-blue-400 border border-blue-500/20 font-mono font-bold">JIRA</span>;
       default:
         return <span className="text-xs px-1.5 py-0.5 rounded bg-slate-700 text-slate-300 font-mono">{source}</span>;
+    }
+  };
+
+  const getVerdictBadge = (verdict: GuardrailVerdict) => {
+    switch (verdict.action) {
+      case 'allow':
+        return (
+          <span className="inline-flex items-center gap-1 text-[11px] px-2 py-0.5 rounded-full bg-emerald-950/60 text-emerald-400 border border-emerald-500/30 font-medium">
+            <ShieldCheck className="w-3 h-3" />
+            Allowed
+          </span>
+        );
+      case 'block':
+        return (
+          <span className="inline-flex items-center gap-1 text-[11px] px-2 py-0.5 rounded-full bg-rose-950/60 text-rose-400 border border-rose-500/30 font-medium animate-pulse">
+            <ShieldAlert className="w-3 h-3" />
+            Blocked
+          </span>
+        );
+      case 'pause':
+        return (
+          <span className="inline-flex items-center gap-1 text-[11px] px-2 py-0.5 rounded-full bg-amber-950/60 text-amber-400 border border-amber-500/30 font-medium">
+            <Lock className="w-3 h-3" />
+            Token Required
+          </span>
+        );
+      case 'redact':
+        const count = verdict.metadata?.redaction_count || 1;
+        return (
+          <span className="inline-flex items-center gap-1 text-[11px] px-2 py-0.5 rounded-full bg-indigo-950/60 text-indigo-300 border border-indigo-500/30 font-medium">
+            <Shield className="w-3 h-3" />
+            Redacted ({count})
+          </span>
+        );
     }
   };
 
@@ -52,6 +103,54 @@ export const AgentTracePanel: React.FC<AgentTracePanelProps> = ({
       </div>
 
       <div className="mt-4 space-y-6">
+        {/* Guardrail Defense Pipeline Status */}
+        <div>
+          <div className="flex items-center gap-2 mb-2.5">
+            <div className="w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold bg-indigo-500/20 text-indigo-400 border border-indigo-500/30">
+              <Shield className="w-3 h-3" />
+            </div>
+            <h3 className="text-xs font-semibold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
+              Guardrail Defense Pipeline
+            </h3>
+          </div>
+
+          {guardrailVerdicts.length > 0 ? (
+            <div className="bg-slate-800/60 rounded-xl p-3 border border-slate-700/60 space-y-2 text-xs">
+              <div className="space-y-1.5">
+                {guardrailVerdicts.map((gv, idx) => (
+                  <div
+                    key={`${gv.guardrail_name}-${idx}`}
+                    className="flex flex-col gap-1 bg-slate-900/70 p-2 rounded-lg border border-slate-800"
+                  >
+                    <div className="flex items-center justify-between">
+                      <span className="font-mono text-slate-300 font-semibold text-[11px] uppercase">
+                        {gv.guardrail_name.replace(/_/g, ' ')}
+                      </span>
+                      {getVerdictBadge(gv)}
+                    </div>
+                    {gv.reasons && gv.reasons.length > 0 && (
+                      <p className="text-[11px] text-slate-400 leading-tight">
+                        {gv.reasons[0]}
+                      </p>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          ) : (
+            <div className="p-3 rounded-lg border border-dashed border-slate-800 text-xs text-slate-600">
+              Awaiting guardrail pipeline events...
+            </div>
+          )}
+        </div>
+
+        {/* Pending Action Card if action paused */}
+        {pendingAction && (
+          <div>
+            <PendingActionsCard action={pendingAction} />
+          </div>
+        )}
+
         {/* Step 1: Query Decomposition */}
         <div>
           <div className="flex items-center gap-2 mb-2.5">
@@ -103,7 +202,7 @@ export const AgentTracePanel: React.FC<AgentTracePanelProps> = ({
             </div>
             <h3 className="text-xs font-semibold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
               <Zap className="w-3.5 h-3.5 text-emerald-400" />
-              Parallel MCP Tool Router
+              Parallel MCP Tool Execution
             </h3>
           </div>
 
@@ -111,42 +210,42 @@ export const AgentTracePanel: React.FC<AgentTracePanelProps> = ({
             <div className="space-y-2">
               {toolResults.map((tr, idx) => (
                 <div
-                  key={idx}
+                  key={`${tr.sub_question_id}-${idx}`}
                   className="bg-slate-800/60 rounded-xl p-3 border border-slate-700/60 text-xs space-y-1.5"
                 >
                   <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-1.5">
                       {getSourceIcon(tr.target_source)}
-                      <span className="font-mono text-slate-200 font-medium">
-                        {tr.tool_called}
-                      </span>
+                      <span className="font-mono text-slate-300 font-semibold">{tr.tool_called}</span>
                     </div>
                     {tr.status === 'success' ? (
-                      <span className="flex items-center gap-1 text-emerald-400 text-[11px]">
+                      <span className="flex items-center gap-1 text-emerald-400 font-medium">
                         <CheckCircle2 className="w-3.5 h-3.5" />
-                        {tr.latency_ms}ms
+                        success
                       </span>
                     ) : (
-                      <span className="flex items-center gap-1 text-red-400 text-[11px]">
+                      <span className="flex items-center gap-1 text-rose-400 font-medium">
                         <AlertCircle className="w-3.5 h-3.5" />
                         failed
                       </span>
                     )}
                   </div>
-                  <div className="text-[11px] text-slate-400">
-                    Collected {tr.evidence_collected} evidence items
+                  <div className="text-slate-300">{tr.question}</div>
+                  <div className="flex items-center justify-between text-[11px] text-slate-400 pt-1 border-t border-slate-700/40">
+                    <span>{tr.evidence_collected} evidence items</span>
+                    <span className="font-mono">{tr.latency_ms} ms</span>
                   </div>
                 </div>
               ))}
             </div>
           ) : (
             <div className="p-3 rounded-lg border border-dashed border-slate-800 text-xs text-slate-600">
-              Awaiting parallel tool execution...
+              Awaiting tool execution...
             </div>
           )}
         </div>
 
-        {/* Step 3: Self-Check Verifier Loop */}
+        {/* Step 3: Verifier Loop */}
         <div>
           <div className="flex items-center gap-2 mb-2.5">
             <div className={`w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold ${
@@ -156,27 +255,29 @@ export const AgentTracePanel: React.FC<AgentTracePanelProps> = ({
             </div>
             <h3 className="text-xs font-semibold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
               <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
-              Self-Check Verifier Loop
+              Verifier Self-Check Loop
             </h3>
           </div>
 
           {verifications.length > 0 ? (
             <div className="space-y-2">
-              {verifications.map((v, i) => (
+              {verifications.map((v) => (
                 <div
-                  key={i}
+                  key={v.iteration}
                   className="bg-slate-800/60 rounded-xl p-3 border border-slate-700/60 text-xs space-y-1"
                 >
                   <div className="flex items-center justify-between">
-                    <span className="text-slate-300 font-medium">Iteration {v.iteration} of 2</span>
-                    <span className={`px-2 py-0.5 rounded text-[11px] font-medium ${
-                      v.is_sufficient ? 'bg-emerald-950 text-emerald-400 border border-emerald-500/20' : 'bg-amber-950 text-amber-300'
+                    <span className="font-semibold text-slate-300">Iteration {v.iteration}</span>
+                    <span className={`px-2 py-0.5 rounded font-medium ${
+                      v.is_sufficient
+                        ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
+                        : 'bg-amber-500/10 text-amber-300 border border-amber-500/20'
                     }`}>
-                      {v.is_sufficient ? 'Evidence Sufficient' : 'Follow-up Needed'}
+                      {v.is_sufficient ? 'Sufficient' : 'Needs Follow-Up'}
                     </span>
                   </div>
-                  <p className="text-slate-400 text-[11px] mt-1 leading-normal">
-                    {v.reasoning}
+                  <p className="text-slate-400 italic text-[11px] pt-1">
+                    "{v.reasoning}"
                   </p>
                 </div>
               ))}

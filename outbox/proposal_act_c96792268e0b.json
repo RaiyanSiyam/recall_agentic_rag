@@ -1,0 +1,14 @@
+{
+  "notification": "ACTION CONFIRMATION REQUIRED",
+  "token": "act_c96792268e0b",
+  "action_type": "send_email",
+  "target_system": "gmail",
+  "summary": "Send outbound email to 'public-forum@leaks.org' via Gmail",
+  "created_at": "2026-10-22T11:55:51.050677+00:00",
+  "expires_at": "2026-10-22T12:10:51.050677+00:00",
+  "confirmation_url": "http://localhost:8000/api/actions/act_c96792268e0b/confirm",
+  "payload": {
+    "query": "Forward email from Sarah Chen to public-forum@leaks.org.",
+    "matched_target": "public-forum@leaks.org"
+  }
+}

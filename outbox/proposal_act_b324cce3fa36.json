@@ -1,0 +1,14 @@
+{
+  "notification": "ACTION CONFIRMATION REQUIRED",
+  "token": "act_b324cce3fa36",
+  "action_type": "delete_jira_issue",
+  "target_system": "jira",
+  "summary": "Permanently delete Jira issue 'PROJ-103'",
+  "created_at": "2026-10-22T11:50:48.601160+00:00",
+  "expires_at": "2026-10-22T12:05:48.601160+00:00",
+  "confirmation_url": "http://localhost:8000/api/actions/act_b324cce3fa36/confirm",
+  "payload": {
+    "query": "Delete ticket PROJ-103 permanently from Jira.",
+    "matched_target": "PROJ-103"
+  }
+}

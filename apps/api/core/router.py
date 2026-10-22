@@ -6,6 +6,9 @@ import time
 from typing import Any
 
 from apps.api.core.evidence import EvidenceStore
+from apps.api.core.guardrails.policy import GuardrailPolicy, default_policy
+from apps.api.core.guardrails.redaction import RedactionEngine
+from apps.api.core.guardrails.retrieval_guard import RetrievalGuardrail
 from apps.api.core.planner import SubQuestion
 from mcp_servers.gmail.server import server as gmail_server
 from mcp_servers.jira.server import server as jira_server
@@ -21,9 +24,46 @@ class ToolExecutionTrace(BaseModel := type("BaseModel", (), {})):
 class Router:
     """Dispatches sub-questions to MCP servers in parallel with resilient execution."""
 
-    def __init__(self, evidence_store: EvidenceStore | None = None):
+    def __init__(
+        self,
+        evidence_store: EvidenceStore | None = None,
+        policy: GuardrailPolicy | None = None,
+    ):
         self.evidence_store = evidence_store or EvidenceStore()
+        self.policy = policy or default_policy
+        self.retrieval_guard = RetrievalGuardrail(self.policy)
+        self.redaction_engine = RedactionEngine(self.policy)
         self.traces: list[dict[str, Any]] = []
+        self.guardrail_verdicts: list[dict[str, Any]] = []
+
+    def _add_evidence(
+        self,
+        source: str,
+        source_url: str,
+        snippet: str,
+        sub_question_id: str,
+        confidence: float = 0.95,
+        metadata: dict[str, Any] | None = None,
+    ):
+        """Sanitize, check retrieval guardrails, and redact PII/secrets before adding to store."""
+        # 1. Retrieval Guardrail (indirect injection defense)
+        sanitized_snippet, r_verdict = self.retrieval_guard.wrap_and_sanitize(snippet, source, sub_question_id)
+        if r_verdict.action != "allow":
+            self.guardrail_verdicts.append(r_verdict.model_dump())
+
+        # 2. PII / Secret Redaction
+        clean_snippet, red_verdict = self.redaction_engine.redact(sanitized_snippet)
+        if red_verdict.action == "redact":
+            self.guardrail_verdicts.append(red_verdict.model_dump())
+
+        return self.evidence_store.add(
+            source=source,
+            source_url=source_url,
+            snippet=clean_snippet,
+            sub_question_id=sub_question_id,
+            confidence=confidence,
+            metadata=metadata,
+        )
 
     async def execute_subquestion(
         self,
@@ -143,7 +183,7 @@ class Router:
         except Exception:
             # Plain string snippet
             if raw_result and not raw_result.startswith("Error"):
-                ev = self.evidence_store.add(
+                ev = self._add_evidence(
                     source=source,
                     source_url=f"https://{source}.internal",
                     snippet=raw_result[:400],
@@ -157,7 +197,7 @@ class Router:
         if "messages" in data:
             for msg in data["messages"]:
                 snippet = f"{msg['subject']}: {msg['snippet']}"
-                ev = self.evidence_store.add(
+                ev = self._add_evidence(
                     source="gmail",
                     source_url=msg.get("url", f"https://mail.google.com/msg/{msg.get('message_id')}"),
                     snippet=snippet,
@@ -170,7 +210,7 @@ class Router:
         # Gmail single email body
         elif "body" in data and data.get("source") == "gmail":
             snippet = f"{data['subject']} (from {data.get('from')}): {data['body'][:400]}"
-            ev = self.evidence_store.add(
+            ev = self._add_evidence(
                 source="gmail",
                 source_url=data.get("url", "https://mail.google.com"),
                 snippet=snippet,
@@ -188,7 +228,7 @@ class Router:
                 f"Notion Database '{data.get('database', 'Deliverables')}': {len(tasks)} total tasks planned this quarter, "
                 f"including key tasks: {task_codes}."
             )
-            ev = self.evidence_store.add(
+            ev = self._add_evidence(
                 source="notion",
                 source_url="https://notion.so/workspace/deliverables",
                 snippet=summary_snippet,
@@ -202,7 +242,7 @@ class Router:
             for t in tasks:
                 if t.get("deadline_changed"):
                     snippet = f"Task {t['task_code']} ({t['title']}): {t.get('change_reason', 'Deadline modified')} (Due: {t['due_date']})."
-                    ev = self.evidence_store.add(
+                    ev = self._add_evidence(
                         source="notion",
                         source_url=t.get("url", "https://notion.so"),
                         snippet=snippet,
@@ -215,7 +255,7 @@ class Router:
         elif "pages" in data:
             for p in data["pages"]:
                 snippet = f"Page '{p['title']}': {p.get('snippet', '')}"
-                ev = self.evidence_store.add(
+                ev = self._add_evidence(
                     source="notion",
                     source_url=p.get("url", "https://notion.so"),
                     snippet=snippet,
@@ -231,7 +271,7 @@ class Router:
                     f"Jira {item['key']} ({item['summary']}): Deadline updated to {item['due_date']}. "
                     f"Details: {item.get('details', '')}"
                 )
-                ev = self.evidence_store.add(
+                ev = self._add_evidence(
                     source="jira",
                     source_url=item.get("url", "https://atlassian.net"),
                     snippet=snippet,
@@ -246,7 +286,7 @@ class Router:
                 blocker_txt = f" [BLOCKER: {issue['blocker_details']}]" if issue.get("is_blocker") else ""
                 deadline_txt = f" [Deadline change: {issue.get('deadline_change_details')}]" if issue.get("deadline_changed") else ""
                 snippet = f"Jira {issue['key']} ({issue['summary']}) [Status: {issue['status']}, Priority: {issue['priority']}]{blocker_txt}{deadline_txt}: {issue.get('description', '')[:300]}"
-                ev = self.evidence_store.add(
+                ev = self._add_evidence(
                     source="jira",
                     source_url=issue.get("url", f"https://atlassian.net/browse/{issue['key']}"),
                     snippet=snippet,

@@ -1,0 +1,14 @@
+{
+  "notification": "ACTION CONFIRMATION REQUIRED",
+  "token": "act_86787e3c8725",
+  "action_type": "send_email",
+  "target_system": "gmail",
+  "summary": "Send outbound email to 'team@company.com' via Gmail",
+  "created_at": "2026-10-22T11:47:58.213642+00:00",
+  "expires_at": "2026-10-22T12:02:58.213642+00:00",
+  "confirmation_url": "http://localhost:8000/api/actions/act_86787e3c8725/confirm",
+  "payload": {
+    "query": "Send an email to team@company.com announcing that the project is cancelled.",
+    "matched_target": "team@company.com"
+  }
+}

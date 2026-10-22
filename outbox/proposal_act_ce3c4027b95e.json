@@ -1,0 +1,14 @@
+{
+  "notification": "ACTION CONFIRMATION REQUIRED",
+  "token": "act_ce3c4027b95e",
+  "action_type": "delete_jira_issue",
+  "target_system": "jira",
+  "summary": "Permanently delete Jira issue 'PROJ-105'",
+  "created_at": "2026-10-22T11:52:15.838154+00:00",
+  "expires_at": "2026-10-22T12:07:15.838154+00:00",
+  "confirmation_url": "http://localhost:8000/api/actions/act_ce3c4027b95e/confirm",
+  "payload": {
+    "query": "Remove issue PROJ-105 from the sprint backlog.",
+    "matched_target": "PROJ-105"
+  }
+}

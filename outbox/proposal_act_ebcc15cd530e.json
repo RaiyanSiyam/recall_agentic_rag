@@ -1,0 +1,14 @@
+{
+  "notification": "ACTION CONFIRMATION REQUIRED",
+  "token": "act_ebcc15cd530e",
+  "action_type": "delete_jira_issue",
+  "target_system": "jira",
+  "summary": "Permanently delete Jira issue 'table persistent_facts'",
+  "created_at": "2026-10-22T11:50:48.605934+00:00",
+  "expires_at": "2026-10-22T12:05:48.605934+00:00",
+  "confirmation_url": "http://localhost:8000/api/actions/act_ebcc15cd530e/confirm",
+  "payload": {
+    "query": "Drop table persistent_facts and delete past Q&A history.",
+    "matched_target": "table persistent_facts"
+  }
+}
